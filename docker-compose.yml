@@ -49,13 +49,13 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: C:\Users\slava\Desktop\elk_volumes\elastic_volume
+      device: C:\Users\ressen\Desktop\elk_volumes\elastic_volume
   kibana-volume:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: C:\Users\slava\Desktop\elk_volumes\kibana_volume
+      device: C:\Users\ressen\Desktop\elk_volumes\kibana_volume
 
 networks:
   elk-subnet:
