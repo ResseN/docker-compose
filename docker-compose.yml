@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    container_name: elastic-container
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx2g"
+    volumes:
+      - elastic-volume:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - elk-subnet
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.12.0
+    container_name: kibana-container
+    depends_on:
+      - elastic
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elastic-container:9200
+    volumes:
+      - kibana-volume:/usr/share/kibana/config
+    networks:
+      - elk-subnet
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    ports:
+      - 6379:6379
+    networks:
+      - elk-subnet
+  metric-beat:
+    image: metric-beat:latest
+    container_name: metric-beat-container
+    depends_on:
+      - elastic
+      - redis
+    networks:
+      - elk-subnet
+
+volumes:
+  elastic-volume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: C:\Users\slava\Desktop\elk_volumes\elastic_volume
+  kibana-volume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: C:\Users\slava\Desktop\elk_volumes\kibana_volume
+
+networks:
+  elk-subnet:
+    driver: bridge
