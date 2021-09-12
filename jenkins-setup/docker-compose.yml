@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  socat:
+    image: alpine/socat
+    container_name: socat-container
+    command: "tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock 
+    ports:
+      - 2375:2375
+    networks:
+      - jenkins
+
+  jenkins:
+    image: jenkinsci/blueocean
+    container_name: jenkins-container
+    depends_on:
+      - socat
+    ports:
+      - 8080:8080
+      - 50000:50000
+    environment:
+      - DOCKER_HOST="tcp://socat:2375" 
+      - DOCKER_TLS_VERIFY=""
+    volumes:
+      - jenkins-volume:/var/jenkins_home
+    networks:
+      - jenkins
+
+volumes:
+  jenkins-volume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: C:\Users\ressen\Desktop\elk_volumes\jenkins_volume
+
+networks:
+  jenkins:
+    driver: bridge
